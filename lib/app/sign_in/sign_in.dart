@@ -1,7 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:timetrackerfluttercourse/app/sign_in/sing_in_button.dart';
+import 'package:timetrackerfluttercourse/app/sign_in/social_sign_in_button.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SignIn extends StatelessWidget {
+  void _signInAnonymous() async {
+    try {
+      final AuthResult signInAnonymously =
+          await FirebaseAuth.instance.signInAnonymously();
+      print(signInAnonymously.user.uid);
+    } catch (e) {
+      print('嗚嗚，匿名連線有錯誤喔。Error code: ${e.toString()}');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,18 +45,18 @@ class SignIn extends StatelessWidget {
           SizedBox(
             height: 48.0,
           ),
-          SingInButton(
+          SocialSignInButton(
             assetName: 'images/google-logo.png',
-            text: 'Sign in with Google',
+            labelName: 'Sign in with Google',
             color: Colors.white,
             onProcess: () {},
           ),
           SizedBox(
             height: 8.0,
           ),
-          SingInButton(
+          SocialSignInButton(
             assetName: 'images/facebook-logo.png',
-            text: 'Sign in with FaceBook',
+            labelName: 'Sign in with Facebook',
             textColor: Colors.white,
             color: Color(0xFF334D92),
             onProcess: () {},
@@ -53,7 +65,6 @@ class SignIn extends StatelessWidget {
             height: 8.0,
           ),
           SingInButton(
-            assetName: 'images/facebook-logo.png',
             text: 'Sign in with email',
             textColor: Colors.white,
             color: Colors.teal[700],
@@ -74,10 +85,9 @@ class SignIn extends StatelessWidget {
             height: 8.0,
           ),
           SingInButton(
-            assetName: 'images/facebook-logo.png',
             text: 'Go anonymous',
             color: Colors.lime[300],
-            onProcess: () {},
+            onProcess: _signInAnonymous,
           ),
         ],
       ),
