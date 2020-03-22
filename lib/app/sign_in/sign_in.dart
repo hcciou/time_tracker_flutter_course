@@ -4,11 +4,14 @@ import 'package:timetrackerfluttercourse/app/sign_in/social_sign_in_button.dart'
 import 'package:firebase_auth/firebase_auth.dart';
 
 class SignIn extends StatelessWidget {
+  const SignIn({this.onSignIn});
+  final Function(FirebaseUser) onSignIn;
+
   void _signInAnonymous() async {
     try {
       final AuthResult signInAnonymously =
           await FirebaseAuth.instance.signInAnonymously();
-      print(signInAnonymously.user.uid);
+      onSignIn(signInAnonymously.user);
     } catch (e) {
       print('嗚嗚，匿名連線有錯誤喔。Error code: ${e.toString()}');
     }
