@@ -1,44 +1,47 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:timetrackerfluttercourse/app/sign_in/sign_in.dart';
+import 'package:timetrackerfluttercourse/app/home_page.dart';
+import 'package:timetrackerfluttercourse/services/auth.dart';
 
 class LandingPage extends StatefulWidget {
+  LandingPage({this.auth});
+  final AuthBase auth;
+
   @override
   _LandingPageState createState() => _LandingPageState();
 }
 
 class _LandingPageState extends State<LandingPage> {
-  FirebaseUser _user;
-  AuthResult _auth;
+  User _user;
 
-  void updateUser(FirebaseUser user) {
+  void _updateUser(User user) {
     setState(() {
       _user = user;
     });
+  }
+
+  Future<void> _checkCurrentUser() async {
+    User user = await widget.auth.checkCurrentUser();
+    _updateUser(user);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _checkCurrentUser();
   }
 
   @override
   Widget build(BuildContext context) {
     if (_user == null) {
       return SignIn(
-        onSignIn: updateUser, // callback
+        onSignIn: _updateUser, // callback
+        auth: widget.auth,
       );
     }
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Home',
-        ),
-        actions: <Widget>[
-          FlatButton(
-            onPressed: () {},
-            child: Icon(
-              Icons.cancel,
-              color: Colors.white,
-            ),
-          ),
-        ],
-      ),
+    return HomePage(
+      signOut: () => _updateUser(null),
+      auth: widget.auth,
     );
   }
 }
