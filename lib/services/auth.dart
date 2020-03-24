@@ -9,12 +9,13 @@ abstract class AuthBase {
   Future<User> checkCurrentUser();
   Future<User> signInAnonymously();
   Future<void> signOut();
+  Stream<User> get authStateChange;
 }
 
 class Auth implements AuthBase {
-  final FirebaseAuth auth = FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  User _uidFromFirebase(FirebaseUser user) {
+  User _userFromFirebase(FirebaseUser user) {
     if (user == null) {
       return null;
     }
@@ -22,19 +23,23 @@ class Auth implements AuthBase {
   }
 
   @override
+  Stream<User> get authStateChange => _auth.onAuthStateChanged
+      .map(_userFromFirebase); // mas 裡面要寫一個函數作轉換，如這裡做 FirebaseUser -> User
+
+  @override
   Future<User> checkCurrentUser() async {
-    FirebaseUser user = await auth.currentUser();
-    return _uidFromFirebase(user);
+    FirebaseUser user = await _auth.currentUser();
+    return _userFromFirebase(user);
   }
 
   @override
   Future<User> signInAnonymously() async {
-    AuthResult result = await auth.signInAnonymously();
-    return _uidFromFirebase(result.user);
+    AuthResult result = await _auth.signInAnonymously();
+    return _userFromFirebase(result.user);
   }
 
   @override
   Future<void> signOut() async {
-    await auth.signOut();
+    await _auth.signOut();
   }
 }
