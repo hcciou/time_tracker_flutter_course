@@ -7,6 +7,22 @@ class SignIn extends StatelessWidget {
   const SignIn({this.auth});
   final AuthBase auth;
 
+  Future<void> _signInFacebook() async {
+    try {
+      auth.signInWithFacebook();
+    } catch (e) {
+      print('嗚嗚，Facebook 連線有錯誤喔。Error code: ${e.toString()}');
+    }
+  }
+
+  Future<void> _signInWithGoogle() async {
+    try {
+      await auth.signInWithGoogle();
+    } catch (e) {
+      print('嗚嗚，Goolge 連線有錯誤喔。Error code: ${e.toString()}');
+    }
+  }
+
   Future<void> _signInAnonymous() async {
     try {
       await auth.signInAnonymously();
@@ -50,7 +66,7 @@ class SignIn extends StatelessWidget {
             assetName: 'images/google-logo.png',
             labelName: 'Sign in with Google',
             color: Colors.white,
-            onProcess: () {},
+            onProcess: _signInWithGoogle,
           ),
           SizedBox(
             height: 8.0,
@@ -60,7 +76,7 @@ class SignIn extends StatelessWidget {
             labelName: 'Sign in with Facebook',
             textColor: Colors.white,
             color: Color(0xFF334D92),
-            onProcess: () {},
+            onProcess: _signInFacebook,
           ),
           SizedBox(
             height: 8.0,
