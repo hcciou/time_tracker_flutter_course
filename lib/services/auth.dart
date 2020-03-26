@@ -32,24 +32,21 @@ class Auth implements AuthBase {
     // Facebook SignIn Step1
     final FacebookLogin facebookLogin = FacebookLogin();
     // Facebook SignIn Step2
-    facebookLogin.loginBehavior = FacebookLoginBehavior.webViewOnly;
-    print('FB 1');
-    final result = await facebookLogin.logInWithReadPermissions(
-      ['email'],
+    final FacebookLoginResult result =
+        await facebookLogin.logInWithReadPermissions(
+      [
+        'email',
+        'public_profile',
+      ],
     );
-
-    print('FB 2');
 
     if (result.accessToken != null) {
       // Facebook SignIn Step3
-      print('FB 3');
-
       final AuthResult authResult = await _auth.signInWithCredential(
         FacebookAuthProvider.getCredential(
             accessToken: result.accessToken.token),
       );
       // Facebook SignIn Step4
-      print('FB 4');
       return _userFromFirebase(authResult.user);
     } else {
       throw PlatformException(
