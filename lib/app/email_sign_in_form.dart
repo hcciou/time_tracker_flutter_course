@@ -25,17 +25,29 @@ class _EmailSignInFromState extends State<EmailSignInFrom> {
   String get _email => emailController.text;
   String get _password => passwordController.text;
   EmailSignInFromState _formType = EmailSignInFromState.signIn;
+  bool _submitted = false;
+  bool _isLoading = false;
 
   void _emailEditingComplete() {
-    FocusScope.of(context).requestFocus(_passwordFocusNode);
+    final FocusNode emailNode = widget.emailValidator.isValid(values: _email)
+        ? _passwordFocusNode
+        : _emailFocusNode;
+    FocusScope.of(context).requestFocus(emailNode);
   }
 
   void _submit() async {
+    setState(() {
+      _submitted = true;
+      _isLoading = true;
+    });
+
     if (_password.isEmpty && _email.isEmpty) {
       return null;
     }
 
     try {
+      // 測 delay 3 秒
+      await Future.delayed(Duration(seconds: 3));
       if (_formType == EmailSignInFromState.signIn) {
         await widget.auth.signInWithEmail(email: _email, password: _password);
       } else {
@@ -51,16 +63,21 @@ class _EmailSignInFromState extends State<EmailSignInFrom> {
 //      );
     } catch (e) {
       print('email 登入失敗。error code = $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
   void _toggleSubmitButton() {
-    print('email= $_email, pw = $_password');
+//    print('email= $_email, pw = $_password');
     setState(() {});
   }
 
   void _toggleFormStatus() {
     setState(() {
+      _submitted = false;
       _formType = _formType == EmailSignInFromState.signIn
           ? EmailSignInFromState.register
           : EmailSignInFromState.signIn;
@@ -78,7 +95,8 @@ class _EmailSignInFromState extends State<EmailSignInFrom> {
 
     // 零零得零
     final bool submitEnabled = widget.emailValidator.isValid(values: _email) &&
-        widget.passwordValidator.isValid(values: _password);
+        widget.passwordValidator.isValid(values: _password) &&
+        !_isLoading;
 
     List<Widget> _buildChildren = [
       _buildEmailTextField(),
@@ -94,7 +112,7 @@ class _EmailSignInFromState extends State<EmailSignInFrom> {
         onPressed: submitEnabled ? _submit : null,
       ),
       FlatButton(
-        onPressed: _toggleFormStatus,
+        onPressed: !_isLoading ? _toggleFormStatus : null,
         child: Text(registerButtonLabel),
       ),
     ];
@@ -110,13 +128,15 @@ class _EmailSignInFromState extends State<EmailSignInFrom> {
   }
 
   TextField _buildPasswordTextField() {
-    bool passwordValid = widget.passwordValidator.isValid(values: _password);
+    bool _showErrorText =
+        _submitted && !widget.passwordValidator.isValid(values: _password);
     return TextField(
       controller: passwordController,
       focusNode: _passwordFocusNode,
       decoration: InputDecoration(
         labelText: 'Password',
-        errorText: passwordValid ? null : widget.inValidPasswordErrorText,
+        errorText: _showErrorText ? widget.inValidPasswordErrorText : null,
+        enabled: _isLoading == false,
       ),
       obscureText: true,
       autocorrect: false,
@@ -129,14 +149,16 @@ class _EmailSignInFromState extends State<EmailSignInFrom> {
   }
 
   TextField _buildEmailTextField() {
-    bool emailValid = widget.emailValidator.isValid(values: _email);
+    bool _showErrorText =
+        _submitted && !widget.emailValidator.isValid(values: _email);
     return TextField(
       controller: emailController,
       focusNode: _emailFocusNode,
       decoration: InputDecoration(
         labelText: 'Email',
         hintText: 'xxx@xxx.com',
-        errorText: emailValid ? null : widget.inValidEmailErrorText,
+        errorText: _showErrorText ? widget.inValidEmailErrorText : null,
+        enabled: _isLoading == false,
       ),
       autofocus: true,
       autocorrect: false,

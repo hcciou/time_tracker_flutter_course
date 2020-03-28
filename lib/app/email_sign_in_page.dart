@@ -13,7 +13,7 @@ class EmailSignInPage extends StatelessWidget {
         title: Text('Sign In'),
         elevation: 2.0,
       ),
-      body: _buildContent(),
+      body: SingleChildScrollView(child: _buildContent()),
       backgroundColor: Colors.grey[200],
     );
   }
