@@ -1,6 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:timetrackerfluttercourse/app/sign_in/validators.dart';
 import 'package:timetrackerfluttercourse/common_widgets/form_submit_button.dart';
+import 'package:timetrackerfluttercourse/common_widgets/platform_alert_dialog.dart';
 import 'package:timetrackerfluttercourse/services/auth.dart';
 
 enum EmailSignInFromState {
@@ -47,7 +49,7 @@ class _EmailSignInFromState extends State<EmailSignInFrom> {
 
     try {
       // 測 delay 3 秒
-      await Future.delayed(Duration(seconds: 3));
+//      await Future.delayed(Duration(seconds: 3));
       if (_formType == EmailSignInFromState.signIn) {
         await widget.auth.signInWithEmail(email: _email, password: _password);
       } else {
@@ -63,6 +65,11 @@ class _EmailSignInFromState extends State<EmailSignInFrom> {
 //      );
     } catch (e) {
       print('email 登入失敗。error code = $e');
+      PlatformAlertDialog(
+        title: '登入失敗',
+        content: e.toString(),
+        defaultActionText: 'OK',
+      ).show(context);
     } finally {
       setState(() {
         _isLoading = false;
