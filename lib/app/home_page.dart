@@ -9,7 +9,6 @@ class HomePage extends StatelessWidget {
   Future<void> _signOut(BuildContext context) async {
     try {
       await auth.signOut();
-      _confirmSignOut(context);
     } catch (e) {
       print('登出失敗。Error code: ${e.toString()}');
     }
@@ -36,7 +35,7 @@ class HomePage extends StatelessWidget {
         ),
         actions: <Widget>[
           FlatButton(
-            onPressed: () => _signOut(context),
+            onPressed: () => _confirmSignOut(context),
             child: Icon(
               Icons.cancel,
               color: Colors.white,
